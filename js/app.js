@@ -8,130 +8,172 @@ class Pelicula{
         this.calificacion = calificacion;
     }
 
+    //Método para cambiar la calificación en caso de que el usuario lo requiera.
+    calificar(calificacion){
+        
+        //Creo una variable la cual tendrá el cálculo de la media entre las calificaciones.
+        let num = (parseInt(calificacion, 10) + parseInt(this.calificacion, 10)) / 2;
+
+        //Asigno la nueva calificación utilizando "toFixed" para redondear a 1 decimal.
+        this.calificacion = num.toFixed(1);
+
+    }
+
 }
 
-//Creo la clase menu
-class Menu{
-
-    constructor(nombre){
-        this.nombre = nombre;
-    }
-
-    //Método para pedir nombre y comprobar que tenga al menos dos caracteres.
-    bienvenida(){
-        
-        let nombre;
-          
-	    nombre = prompt("¡Hola! Por favor ingresa tu nombre (al menos 2 caracteres):");
-        //Bucle while para corroborar el nombre.
-	     while(nombre.length < 2){
-             nombre = prompt("Nombre demasiado corto, intenta de nuevo:");
-        }
-
-        this.nombre = nombre;  
-    }
-
-    //Método mostrarMenu que permite acceder a todas las funciones disponibles mediante un prompt y un switch.
-    mostrarMenu(){
+//Función para mostrar un menu con el nombre del usuario y un array para asignar a las demás funciones.
+let menu = (nombre, array) => {
 
         //Defino variable para pedir las opciones al usuario
-        let eleccion = prompt(`Saludos ${this.nombre}, elige una de las opciones a continuación: \n1) Mostrar películas. \n2) Agregar película. \n3) Salir.`);
+        let eleccion = prompt(`Saludos ${nombre}, elige una de las opciones a continuación: \n1) Mostrar películas. \n2) Agregar película. \n3) Salir.`);
 
         switch(eleccion){
             case '1':
-                this.mostrarPeliculas();
-                this.mostrarMenu();
+                //Función que muestra la pelicula que mediante la función "pedirOpcion" se seleccionó.
+                mostrarPelicula(array, pedirOpcion(array));
+
+                //Volver al menu.
+                menu(nombre, array);
                 break;
             case '2':
-                this.agregarPelicula();
-                this.mostrarMenu();
+                //Función que permite agregar una película a la lista.
+                agregarPelicula();
+
+                menu(nombre, array);
                 break;
             case '3':
                 alert("¡Adiós!");
                 break;
             default:
                 alert("Ingrese una opción válida.");
-                this.mostrarMenu();
+                menu(nombre, array);
+        }
+}
+
+//Función para pedir nombre al usuario.
+let bienvenida = () => {
+        
+    let nombre;
+      
+    nombre = prompt("¡Hola! Por favor ingresa tu nombre (al menos 2 caracteres):");
+
+    //Bucle while para corroborar el nombre.
+     while(nombre.length < 2){
+         nombre = prompt("Nombre demasiado corto, intenta de nuevo:");
+    }
+
+    return nombre; 
+}
+
+//Función para mostrar la película(array) especificada en la opción y dar la posibilidad de calificarla.
+let mostrarPelicula = (array, opcion) => {
+
+    //Muestro la película solicitada en la opción.
+    alert(`Título: ${peliculas[(opcion-1)].nombre} \nDescripción: \n${peliculas[(opcion-1)].descripcion}\nGénero: ${peliculas[(opcion-1)].genero}\nCalificación: ${peliculas[(opcion-1)].calificacion}`);
+
+    //En caso de que el usuario confirme que quiere calificar la película, se llama a la funcion obtenerCalificacion.
+    let calificar = confirm(`Si quieres dejar una calificación, presiona aceptar. De caso contrario, presiona cancelar para volver al menú.`);
+
+    if(calificar){
+
+        obtenerCalificacion(array, opcion);
+
+    }
+
+    // calificar(pedirOpcion(array,opcion));
+    alert("Redirigiendo al menú.");
+}
+
+//Función para agregar una nueva película.
+let agregarPelicula = () => {
+
+    //Creo nuevo objeto en el array "peliculas" con los datos proporcionados por el usuario.
+    peliculas.push(new Pelicula(
+        prompt(`Ingresa el nombre de la película: `),
+        prompt(`Ingresa la descripción, mínimo 50 caracteres: `),
+        prompt(`¿Cuál es el género o los géneros?:`),
+        prompt(`Calificación entre 1 y 5:`),
+        ));
+   
+        //Evitar que se ingrese un dato vacío.
+    while(peliculas[peliculas.length-1].nombre < 1){
+            peliculas[peliculas.length-1].nombre = prompt("Nombre no válido, intenta nuevamente:");
+    }
+
+        //Si la calificación es mayor a 5, menor a 1 o no es un número, se informa al usuario del error y se le pide que vuelva a introducir los datos.
+    while((peliculas[peliculas.length-1].calificacion > 5) || (peliculas[peliculas.length-1].calificacion < 1) || isNaN(peliculas[peliculas.length-1].calificacion)){
+            peliculas[peliculas.length-1].calificacion = prompt("Calificación no válida, por favor intente nuevamente:");
+            
+    }
+
+        //Si la descripción es menor a 50 caracteres o son números, se informa al usuario y se pide nuevamente el ingreso de datos.
+    while((peliculas[peliculas.length-1].descripcion.length < 50) || !(isNaN(peliculas[peliculas.length-1].descripcion))){
+            peliculas[peliculas.length-1].descripcion = prompt("Descripción demasiado corta o inválida, por favor escriba un mínimo de 50 caracteres. Vuelva a ingresar una descripción:");
+
+    }
+
+        //Si el género es un número o es menor a 3 caracteres, se informa y se pide otra vez.
+    while((!(isNaN(peliculas[peliculas.length-1].genero)) || (peliculas[peliculas.length-1].genero.length < 3))){
+            peliculas[peliculas.length-1].genero = prompt("Vuelva a ingresar un género:");
+
+    }
+
+    alert("Redirigiendo al menú.");
+
+}
+
+//Función para obtener la calificación.
+let obtenerCalificacion = (array, opcion) =>{
+
+    //Obtengo el nombre de la pelicula a calificar.
+    let nombrePelicula = peliculas[(opcion-1)].nombre;
+
+    //Pido la calificación.
+    let calificacion = prompt(`Ingrese la calificación entre 1-5 de ${nombrePelicula}, en caso de no querer dejar una calificación, por favor introduzca 0.`);
+    
+    //Verifico que la calificación no tenga letras y se encuentre entre 1-5.
+    while((isNaN(calificacion)) || (calificacion > 5) || (calificacion < 1) || (calificacion === null)){
+        //Si calificación = 0, se sale el bucle while y vuelve al menu.
+        if(calificacion === "0"){
+            break;
+        }
+        else{
+            calificacion = prompt(`Calificación inválida, ingrese la calificación entre 1-5 de ${nombrePelicula}, en caso de no querer dejar una calificación, introduzca 0.`);
         }
     }
 
-    //Método para agregar películas.
-    agregarPelicula(){
+    //Si la calificación no es 0, entonces busco la película dentro del array de objetos con un findIndex, luego envío la calificación al objeto en cuestión con el método calificar para modificar su calificación.
+    if(calificacion !== "0"){
 
-        //Declaro variable booleana para validar las comprobaciones.
-        let error;
+        //Busco el indice del objeto a modificar la calificación.
+        let index = array.findIndex((array) => array.nombre == nombrePelicula);
 
-        //Creo nuevo objeto en el array "peliculas" con los datos proporcionados por el usuario.
-        peliculas.push(new Pelicula(
-            prompt(`Ingresa el nombre de la película: `),
-            prompt(`Ingresa la descripción, mínimo 50 caracteres: `),
-            prompt(`¿Cuál es el género o los géneros?:`),
-            prompt(`Calificación entre 1 y 5:`),
-            ))
+        //Envío el objeto con el método calificar y su nueva calificación.
+        array[index].calificar(calificacion);
 
-        //Mediante un bucle do while, compruebo cada dato.
-        do{
-            
-            //Evitar que se ingrese un dato vacío.
-            if(peliculas[peliculas.length-1].nombre < 1){
-                peliculas[peliculas.length-1].nombre = prompt("Nombre no válido, intenta nuevamente:");
-            }
+        alert("Gracias por calificar.");
 
-            //Si la calificación es mayor a 5, menor a 1 o no es un número, se informa al usuario del error y se le pide que vuelva a introducir los datos.
-            if((peliculas[peliculas.length-1].calificacion > 5) || (peliculas[peliculas.length-1].calificacion < 1) || isNaN(peliculas[peliculas.length-1].calificacion)){
-                peliculas[peliculas.length-1].calificacion = prompt("Calificación no válida, por favor intente nuevamente:");
-                error = true;
-            }
+    }
 
-            //Si la descripción es menor a 50 caracteres o son números, se informa al usuario y se pide nuevamente el ingreso de datos.
-            if((peliculas[peliculas.length-1].descripcion.length < 50) || !(isNaN(peliculas[peliculas.length-1].descripcion))){
-                peliculas[peliculas.length-1].descripcion = prompt("Descripción demasiado corta o inválida, por favor escriba un mínimo de 50 caracteres. Vuelva a ingresar una descripción:");
-                error = true;
-            }
+}
 
-            //Si el género es un número o es menor a 3 caracteres, se informa y se pide otra vez.
-            if((!(isNaN(peliculas[peliculas.length-1].genero)) || (peliculas[peliculas.length-1].genero.length < 3))){
-                peliculas[peliculas.length-1].genero = prompt("Vuelva a ingresar un género:");
-                error = true;
-            }
+//Función pedirOpcion para mostrar y pedir las opciones, ordenándolas según el array proporcionado.
+let pedirOpcion = (array) => {
 
-            else{
-                error = false;
-            }
-
-        //Mientras error === true, el bucle no avanza.
-        }while(error === true);
-
-        alert("Redirigiendo al menú.");
-
-        }
-
-    //Método para mostrar las peliculas que se encuentran almacenadas.
-    mostrarPeliculas(){
-
-        //Utilizo map para extraer los nombres de las peliculas en una nueva variable.
-        let show = peliculas.map(function(element){
+        //Mapeo el array obtenido como argumento para sacar los nombres de las películas.
+        let show = array.map(function(element){
             return `${element.nombre}`;
         })
-        
-        //Utilizo método calificar con el método pedirOpcion para pedir las opciones, mostrar la que el usuario elija y darle la posibilidad de calificarla.
-        this.calificar(this.pedirOpcion(show))
-
-        alert("Redirigiendo al menú.");
-    }
-
-    //Método pedirOpcion para mostrar y pedir las opciones al usuario. Pide un array para crear las opciones. Devuelve la opción elegida.
-    pedirOpcion(array){
 
         //Defino la variable que almacenará la opción elegida.
-        let opcion
+        let opcion;
 
         //Creo array para sostener los objetos y mostrarlos.
         let sosten = [];
 
         //Utilizo un for para recorrer el array y almaceno en sosten los valores junto con un índice.
-        for(let i = 0; i<array.length; i++){
-            sosten[i] = [`${i+1}) ${array[i]}`];
+        for(let i = 0; i<show.length; i++){
+            sosten[i] = [`${i+1}) ${show[i]}`];
         }
 
         //Pido opción al usuario.
@@ -143,36 +185,6 @@ class Menu{
            }
  
         return opcion;
-    }
-
-    //Método para darle al usuario la posibildad de insertar calificaciones entre 1 y 5 a la película seleccionada, estas calificaciones se promedian. Toma como parámetro la opción elegida previamente en el método pedirOpcion.
-    calificar(opcion){
-
-        //Un confirm que muestra la película selecionada, si el usuario acepta, puede dejar una calificación.
-        let calificar = confirm(`Título: ${peliculas[opcion-1].nombre} \nDescripción: \n${peliculas[opcion-1].descripcion}\nGénero: ${peliculas[opcion-1].genero}\nCalificación: ${peliculas[opcion-1].calificacion} \nSi quieres dejar una calificación, presiona aceptar. De caso contrario, presiona cancelar para volver al menú.`);
-
-        //Si el usuario acepta, se suma 1 al contador
-        if(calificar === true){
-
-            let cont = 1;
-
-            cont ++;
-
-
-            //Se pide la nueva calificación.
-            let nuevaCalificacion = prompt(`Ingresa tu calificación de ${peliculas[opcion-1].nombre}`);
-
-            while((nuevaCalificacion > 5) || (nuevaCalificacion < 1) || isNaN(nuevaCalificacion)){
-                nuevaCalificacion = prompt("Calificación no válida, por favor intente nuevamente:");
-            }
-
-            //Se hace un promedio entre ambas calificaciones.
-            peliculas[opcion-1].calificacion = (parseInt(peliculas[opcion-1].calificacion, 10)+ parseInt(nuevaCalificacion, 10)) / cont;
-
-            alert("Gracias por tu calificación.");
-        }
-        
-    }
 }
 
 //Creo un array de objetos que contiene varias películas.
@@ -227,12 +239,8 @@ let peliculas=[
     )
 ]
 
-
-//Creo objeto menu.
-let nuevoMenu = new Menu();
-
-nuevoMenu.bienvenida();
-nuevoMenu.mostrarMenu();
+//Llamo a la función "menu" dándole el nombre mediante la función "bienvenida" y el array peliculas.
+menu(bienvenida(), peliculas);
 
 
    
