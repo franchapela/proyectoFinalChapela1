@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Proyecto Final</title> 
+    <title>Repelis</title> 
 
     <link rel="stylesheet" href="./styles/styles.css">
 
@@ -19,10 +19,21 @@
     <main>
         <div class="main-container">
             <div class="main-content">
+                <div class="add">
+                    <form>
+                        <label for="add" aria-hidden="true">Agregar película</label>
+                        <label for="add" aria-hidden="true" id="alerta">Título de al menos 1 caracter. <br> Descripción de al menos 50 caracteres. <br>Género con al menos 3 caracteres. </label>
+                        <input type="text" name="title" id="title" placeholder="Título" required="" minlength="1">
+                        <textarea id="desc" name="description" rows="2" cols="50" required="" placeholder="Descripción" minlength="50"></textarea>
+                        <input type="text" name="gen" id="gen" placeholder="Género" required="" minlength="3">
+                        <input type="number" name="cal" id="cal" placeholder="Calificación" required="" min="1" max="5">
+                        <input type="submit" id="add" class="button" value="Añadir"></input>
+                    </form>
+                </div>
+                <div class="container-peliculas" id="container-peliculas">
+                    
 
-            </div>
-            <div class="aside-container">
-
+                </div>
             </div>
         </div>
     </main>
