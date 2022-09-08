@@ -8,8 +8,9 @@ class Pelicula{
         this.calificacion = calificacion;
     }
 }
+
 //Funcion para añadir peliculas
-function anadirPelicula(e){
+let anadirPelicula = (e) =>{
 
     e.preventDefault();
 
@@ -23,35 +24,50 @@ function anadirPelicula(e){
     const calificacionPelicula = document.getElementById("cal").value;
     let alerta = document.getElementById("alerta");
 
-    //Verifico los datos para evitar datos vacíos con trim().
-    if((nombrePelicula.trim().length < 1) || (descripcionPelicula.trim().length < 50) || (generoPelicula.trim().length < 3) || (calificacionPelicula < 1) || (calificacionPelicula >5)){
-        alerta.style.color = "red";
-    }
-    else{
+    //Verifico los datos para evitar datos vacíos con trim(). En caso de que los datos sean correctos, llamo a la funcion crearPelicula().
+    (nombrePelicula.trim().length < 1) || (descripcionPelicula.trim().length < 50) || (generoPelicula.trim().length < 3) || (calificacionPelicula < 1) || (calificacionPelicula >5) ? alerta.style.color = "red" : crearPelicula(nombrePelicula, descripcionPelicula, generoPelicula, calificacionPelicula);
+   
+}
 
-        //Creo la película
-        let pelicula = 
-            new Pelicula(
-                nombrePelicula,
-                descripcionPelicula,
-                generoPelicula,
-                calificacionPelicula
-            )
+let crearPelicula = (nombre, descripcion, genero, calificacion) =>{
 
-        //Agrego la película al array
-        peliculas.push(pelicula);
-        
-        //Seteo las películas en localStorage.
-        localStorage.setItem("peliculas", JSON.stringify(peliculas));
-        
-        //Recargo la página para que se visualicen los cambios.
+    let pelicula = 
+        new Pelicula(
+            nombre,
+            descripcion,
+            genero,
+            calificacion
+        )
+
+    //Agrego la película al array
+    peliculas.push(pelicula);
+
+    //Seteo las películas en localStorage.
+    localStorage.setItem("peliculas", JSON.stringify(peliculas));
+
+    //Creo alerta para el usuario.
+    Toastify({
+        text: "Pelicula creada",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+          background: "linear-gradient(to right, #0f0c29, #302b63)",
+        },
+        avatar: "./assets/clapperboard.png",
+      }).showToast();
+
+    //Recargo la página para que se visualicen los cambios.
+    setTimeout(function(){
         window.location.reload();
-    }
-    
+     }, 1000);
+
 }
 
 //Funcion para mostrar las películas.
-function mostrarPeliculas(){
+let mostrarPeliculas = () =>{
 
     //Recupero las películas almacenadas en el localStorage
     peliculas = JSON.parse(localStorage.getItem("peliculas") || "[]");
@@ -74,6 +90,7 @@ function mostrarPeliculas(){
         calificacion.innerHTML = (`Calificación: ${peliculas[i].calificacion}`);
         botonEliminar.innerHTML = ('Eliminar');
 
+        
         //Añado las clases
         peli.classList.add('peli');
         titulo.classList.add('texto1', 'titulo');
@@ -97,20 +114,32 @@ function mostrarPeliculas(){
 }
 
 //Funcion para eliminar la película.
-function eliminarPelicula(titulo){
-
-    //Bucle for para comparar la película con el titulo ingresado, la elimina del array y actualiza el localStorage.
+let eliminarPelicula = (titulo) =>{
     for(let i = 0; i<peliculas.length; i++){
-        if(titulo === peliculas[i].nombre){
+        titulo === peliculas[i].nombre && peliculas.splice(i, 1);
+         localStorage.setItem("peliculas", JSON.stringify(peliculas)); 
+        
+}
+    //Recargo la página para que se visualicen los cambios.
+    setTimeout(function(){
+        window.location.reload();
+     }, 500);
+}
 
-            peliculas.splice(i, 1);
+let notificacion = (texto) =>{
 
-            localStorage.setItem("peliculas", JSON.stringify(peliculas));
-            
-            window.location.reload();
-        }
-    }
-    
+    Toastify({
+        text: texto,
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+          background: "linear-gradient(to right, #0f0c29, #302b63)",
+        },
+        avatar: "./assets/clapperboard.png",
+      }).showToast();
 
 }
 
@@ -136,6 +165,8 @@ for (let btn of document.getElementsByClassName("eliminar-btn")){
     btn.addEventListener("click", () => {
 
         eliminarPelicula(btn.closest(".peli").querySelector(".titulo").textContent);
+
+        notificacion("Pelicula eliminada")
 
       })
 
