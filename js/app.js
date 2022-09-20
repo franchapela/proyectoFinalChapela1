@@ -98,7 +98,6 @@ let mostrarPeliculas = () =>{
         genero.classList.add('texto2');
         calificacionContenedor.classList.add('container-calif');
         calificacion.classList.add('calificacion');
-        botonEliminar.classList.add('eliminar-btn');
         
         
         peli.appendChild(titulo);
@@ -106,26 +105,55 @@ let mostrarPeliculas = () =>{
         peli.appendChild(genero);
         peli.appendChild(calificacionContenedor);
         calificacionContenedor.appendChild(calificacion);
-        calificacionContenedor.appendChild(botonEliminar);
 
         
         contenedorPeliculas.appendChild(peli);
     }
 }
 
-//Funcion para eliminar la película.
-let eliminarPelicula = (titulo) =>{
-    for(let i = 0; i<peliculas.length; i++){
-        titulo === peliculas[i].nombre && peliculas.splice(i, 1);
-         localStorage.setItem("peliculas", JSON.stringify(peliculas)); 
-        
-}
-    //Recargo la página para que se visualicen los cambios.
-    setTimeout(function(){
-        window.location.reload();
-     }, 500);
+//Función para agregar peliculas ya cargadas en el fetch
+let pelisDefault = () =>{
+    //fetch a mi propio json con las películas
+    fetch('./peliculas.json')
+
+    .then(response => response.json())
+
+    .then((data) => {
+        //Almaceno los datos como array en una constante
+        const arrayPelis = Object.values(data)
+        //Mapeo los datos
+        arrayPelis.map( (element) =>{
+
+            const titulo = element.nombre
+
+            const desc = element.descripcion
+
+            const gen = element.genero
+
+            const calif = element.clasificacion
+            //Coloco la película dentro del html
+            const pelicula = `
+                <div class="peli">
+
+                    <span class="texto1 titulo">${titulo}</span>
+
+                    <p class="texto2">${desc}</p>
+
+                    <span class="texto2">${gen}</span>
+
+                    <div class="container-calif">
+                        <p class="calificacion">Calificación: ${calif}</p>
+                    </div>
+
+                </div>
+            `
+            //Muestro la película
+            document.getElementById("container-peliculas").innerHTML += pelicula 
+        })
+    })
 }
 
+//Función para notificar mediante toastify
 let notificacion = (texto) =>{
 
     Toastify({
@@ -159,16 +187,4 @@ mostrarPeliculas();
 //EventListener para añadir la película.
 anadir.addEventListener('click', anadirPelicula);
 
-//For para obtener el evento del botón Eliminar y así borrar la película con la funcion eliminarPelicula.
-for (let btn of document.getElementsByClassName("eliminar-btn")){
-
-    btn.addEventListener("click", () => {
-
-        eliminarPelicula(btn.closest(".peli").querySelector(".titulo").textContent);
-
-        notificacion("Pelicula eliminada")
-
-      })
-
-}
-
+pelisDefault();
