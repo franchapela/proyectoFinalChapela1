@@ -120,17 +120,17 @@ let pelisDefault = () =>{
 
     .then((data) => {
         //Almaceno los datos como array en una constante
-        const arrayPelis = Object.values(data)
+        const arrayPelis = Object.values(data);
         //Mapeo los datos
         arrayPelis.map( (element) =>{
 
-            const titulo = element.nombre
+            const titulo = element.nombre;
 
-            const desc = element.descripcion
+            const desc = element.descripcion;
 
-            const gen = element.genero
+            const gen = element.genero;
 
-            const calif = element.clasificacion
+            const calif = element.clasificacion;
             //Coloco la película dentro del html
             const pelicula = `
                 <div class="peli">
